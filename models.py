@@ -34,12 +34,21 @@ class Movie(db.Model):
     castings = db.relationship('Casting', backref='movie', lazy='joined', cascade="all, delete")
 
     def update(self, d = None):
-          if d is not None:
-            genres = d.getlist('genres')
-            self.genres = ','.join(genres)
-            for key, value in d.items():
-              if key != "genres":
-                setattr(self, key, value)
+      if d is not None:
+        genres = d.getlist('genres')
+        self.genres = ','.join(genres)
+        for key, value in d.items():
+          if key != "genres":
+            setattr(self, key, value)
+      db.session.commit()
+
+    def insert(self):
+      db.session.add(self)
+      db.session.commit()
+
+    def delete(self):
+      db.session.delete(self)
+      db.session.commit()
 
     def format(self):
         return {
@@ -74,12 +83,21 @@ class Actor(db.Model):
     castings = db.relationship('Casting', backref='actor', lazy='joined', cascade="all, delete")
 
     def update(self, d = None):
-          if d is not None:
-            genres = d.getlist('genres')
-            self.genres = ','.join(genres)
-            for key, value in d.items():
-              if key != "genres":
-                setattr(self, key, value)
+      if d is not None:
+        genres = d.getlist('genres')
+        self.genres = ','.join(genres)
+        for key, value in d.items():
+          if key != "genres":
+            setattr(self, key, value)
+      db.session.commit()
+
+    def insert(self):
+      db.session.add(self)
+      db.session.commit()
+
+    def delete(self):
+      db.session.delete(self)
+      db.session.commit()
 
     def format(self):
         return {
@@ -105,6 +123,17 @@ class Casting(db.Model):
     movie_id = db.Column(db.Integer, db.ForeignKey('Movie.id'), nullable=False)
     start_time = db.Column(db.TIMESTAMP)
     place = db.Column(db.String)
+
+    def update(self):
+      db.session.commit()
+
+    def insert(self):
+      db.session.add(self)
+      db.session.commit()
+
+    def delete(self):
+      db.session.delete(self)
+      db.session.commit()
 
     def format(self):
         return {

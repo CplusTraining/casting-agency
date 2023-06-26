@@ -56,45 +56,7 @@ def create_app(test_config=None):
 
       return current_items
 
-    #----------------------------------------------------------------------------#
-    # Controllers.
-    #----------------------------------------------------------------------------#
-
-    @app.route('/')
-    def index():
-      readme_file = open("README.md", "r")
-      md_template_string = markdown.markdown(
-          readme_file.read(), extensions=["fenced_code"]
-      )
-      return md_template_string
-
-    #  Movies
-    #  ----------------------------------------------------------------
-
-    @app.route('/movies')
-    @requires_auth('get:movies')
-    def movies():
-      movies = Movie.query.order_by(Movie.id).all()
-      current_movies = []
-      if len(movies) > 0:
-          current_movies = paginate_items(request, movies)
-
-      if len(current_movies) == 0:
-          abort(404)
-
-      return jsonify(
-        {
-            "success": True,
-            "movies": current_movies,
-            "total_movies": len(movies),
-        }
-      )
-
-    @app.route('/movies/search', methods=['POST'])
-    @requires_auth('get:movies')
-    def search_movies():
-      search_term = request.get_json().get("searchTerm", None)
-        
+    def search_movies(search_term):
       if search_term:
         movies = Movie.query.order_by(Movie.id).filter(
                     Movie.name.ilike("%{}%".format(search_term))
@@ -115,6 +77,65 @@ def create_app(test_config=None):
 
       abort(400)
 
+    def search_actors(search_term):
+      if search_term:
+        actors = Actor.query.order_by(Actor.id).filter(
+                    Actor.name.ilike("%{}%".format(search_term))
+        ).all()
+
+        if len(actors) == 0:
+            abort(404)
+
+        current_actors = paginate_items(request, actors)
+
+        return jsonify(
+            {
+                "success": True,
+                "actors": current_actors,
+                "total_actors": len(actors),
+            }
+        )
+
+      abort(400)
+
+    #----------------------------------------------------------------------------#
+    # Controllers.
+    #----------------------------------------------------------------------------#
+
+    @app.route('/')
+    def index():
+      readme_file = open("README.md", "r")
+      md_template_string = markdown.markdown(
+          readme_file.read(), extensions=["fenced_code"]
+      )
+      return md_template_string
+
+    #  Movies
+    #  ----------------------------------------------------------------
+
+    @app.route('/movies')
+    @requires_auth('get:movies')
+    def movies():
+      search_term = request.args.get("searchTerm", "", type = str)
+      if search_term is not None:
+        return search_movies(search_term)
+
+      movies = Movie.query.order_by(Movie.id).all()
+      current_movies = []
+      if len(movies) > 0:
+          current_movies = paginate_items(request, movies)
+
+      if len(current_movies) == 0:
+          abort(404)
+
+      return jsonify(
+        {
+            "success": True,
+            "movies": current_movies,
+            "total_movies": len(movies),
+        }
+      )
+
     @app.route('/movies/<int:movie_id>')
     @requires_auth('get:movies')
     def casting_movie(movie_id):
@@ -129,7 +150,7 @@ def create_app(test_config=None):
 
     #  Create Movie
     #  ----------------------------------------------------------------
-    @app.route('/movies/create', methods=['POST'])
+    @app.route('/movies', methods=['POST'])
     @requires_auth('add:movies')
     def create_movie():
       error = False
@@ -159,15 +180,14 @@ def create_app(test_config=None):
           genres = request.form.getlist('genres')
           movie.genres = ','.join(genres)
 
-          db.session.add(movie)
-          db.session.commit()
+          movie.insert()
         except:
-            db.session.rollback()
-            error = True
-            errorMsg = str(sys.exc_info())
-            print(sys.exc_info())
+          db.session.rollback()
+          error = True
+          errorMsg = str(sys.exc_info())
+          print(sys.exc_info())
         finally:
-            db.session.close()
+          db.session.close()
 
       
       if error:
@@ -191,8 +211,7 @@ def create_app(test_config=None):
       error = False
       try:
         movie = Movie.query.get(movie_id)
-        db.session.delete(movie)
-        db.session.commit()
+        movie.delete()
       except:
         db.session.rollback()
         error = True
@@ -220,6 +239,10 @@ def create_app(test_config=None):
     @app.route('/actors')
     @requires_auth('get:actors')
     def actors():
+      search_term = request.args.get("searchTerm", "", type = str)
+      if search_term is not None:
+        return search_actors(search_term)
+
       actors = Actor.query.order_by(Actor.id).all()
       current_actors = []
       if len(actors) > 0:
@@ -236,31 +259,6 @@ def create_app(test_config=None):
         }
       )
 
-    @app.route('/actors/search', methods=['POST'])
-    @requires_auth('get:actors')
-    def search_actors():
-      search_term = request.get_json().get("searchTerm", None)
-        
-      if search_term:
-        actors = Actor.query.order_by(Actor.id).filter(
-                    Actor.name.ilike("%{}%".format(search_term))
-        ).all()
-
-        if len(actors) == 0:
-            abort(404)
-
-        current_actors = paginate_items(request, actors)
-
-        return jsonify(
-            {
-                "success": True,
-                "actors": current_actors,
-                "total_actors": len(actors),
-            }
-        )
-
-      abort(400)
-
     @app.route('/actors/<int:actor_id>')
     @requires_auth('get:actors')
     def casting_actor(actor_id):
@@ -275,7 +273,7 @@ def create_app(test_config=None):
 
     #  Update
     #  ----------------------------------------------------------------
-    @app.route('/actors/<int:actor_id>/edit', methods=['PATCH'])
+    @app.route('/actors/<int:actor_id>', methods=['PATCH'])
     @requires_auth('update:actors')
     def edit_actor(actor_id):
       error = False
@@ -308,14 +306,13 @@ def create_app(test_config=None):
           
           actor_format = actor.format()
 
-          db.session.add(actor)
-          db.session.commit()
+          actor.update()
         except:
-            db.session.rollback()
-            error = True
-            errorMsg = str(sys.exc_info())
+          db.session.rollback()
+          error = True
+          errorMsg = str(sys.exc_info())
         finally:
-            db.session.close()
+          db.session.close()
 
       if error:
         return jsonify(
@@ -332,7 +329,7 @@ def create_app(test_config=None):
         }
       )
 
-    @app.route('/movies/<int:movie_id>/edit', methods=['PATCH'])
+    @app.route('/movies/<int:movie_id>', methods=['PATCH'])
     @requires_auth('update:movies')
     def edit_movie(movie_id):
       error = False
@@ -364,14 +361,13 @@ def create_app(test_config=None):
 
           movie_format = movie.format()
 
-          db.session.add(movie)
-          db.session.commit()
+          movie.insert()
         except:
-            db.session.rollback()
-            error = True
-            errorMsg = str(sys.exc_info())
+          db.session.rollback()
+          error = True
+          errorMsg = str(sys.exc_info())
         finally:
-            db.session.close()
+          db.session.close()
 
       if error:
         return jsonify(
@@ -390,7 +386,7 @@ def create_app(test_config=None):
 
     #  Create Actor
     #  ----------------------------------------------------------------
-    @app.route('/actors/create', methods=['POST'])
+    @app.route('/actors', methods=['POST'])
     @requires_auth('add:actors')
     def create_actor():
       error = False
@@ -498,7 +494,7 @@ def create_app(test_config=None):
         }
       )
 
-    @app.route('/castings/create', methods=['POST'])
+    @app.route('/castings', methods=['POST'])
     @requires_auth('add:castings')
     def create_casting():
       error = False

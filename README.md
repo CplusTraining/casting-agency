@@ -54,31 +54,31 @@ The access token will be displayed on the URL bar after login.
 ### Resource endpoint library
 `GET /movies`
 
-`POST /movies/search`
+`GET /movies?searchTerm=search_term`
 
-`GET /movies/<int:movie_id>`
+`GET /movies/<movie_id>`
 
-`PATCH /movies/<int:movie_id>/edit`
+`PATCH /movies/<movie_id>`
 
-`POST /movies/create`
+`POST /movies`
 
 `DELETE /movies/<movie_id>`
 
 `GET /actors`
 
-`POST /actors/search`
+`GET /actors?searchTerm=search_term`
 
-`GET /actors/<int:actor_id>`
+`GET /actors/actor_id`
 
-`PATCH /actors/<int:actor_id>/edit`
+`PATCH /actors/actor_id>`
 
-`POST /actors/create`
+`POST /actors`
 
 `DELETE /actors/<actor_id>`
 
 `GET /castings`
 
-`POST /castings/create`
+`POST /castings`
 
 `DELETE /castings/<casting_id>`
 
