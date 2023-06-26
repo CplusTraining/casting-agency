@@ -4,7 +4,7 @@
 
 import dateutil.parser
 import babel
-from flask import Flask, request, jsonify, abort
+from flask import Flask, request, jsonify, abort, render_template
 from sqlalchemy import func
 import logging
 from logging import Formatter, FileHandler
@@ -15,6 +15,7 @@ from models import setup_db, Movie, Actor, Casting, db
 from flask_cors import CORS
 from auth import AuthError, requires_auth
 import json
+import markdown
 
 
 def create_app(test_config=None):
@@ -61,7 +62,11 @@ def create_app(test_config=None):
 
     @app.route('/')
     def index():
-      return "Casting agency doc"
+      readme_file = open("README.md", "r")
+      md_template_string = markdown.markdown(
+          readme_file.read(), extensions=["fenced_code"]
+      )
+      return md_template_string
 
     #  Movies
     #  ----------------------------------------------------------------
