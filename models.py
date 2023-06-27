@@ -42,7 +42,13 @@ class Movie(db.Model):
             setattr(self, key, value)
       db.session.commit()
 
-    def insert(self):
+    def insert(self, d = None):
+      if d is not None:
+        genres = d.getlist('genres')
+        self.genres = ','.join(genres)
+        for key, value in d.items():
+          if key != "genres":
+            setattr(self, key, value)
       db.session.add(self)
       db.session.commit()
 

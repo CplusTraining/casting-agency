@@ -14,8 +14,8 @@ from datetime import datetime
 from models import setup_db, Movie, Actor, Casting, db
 from flask_cors import CORS
 from auth import AuthError, requires_auth
-import json
 import markdown
+
 
 
 def create_app(test_config=None):
@@ -117,7 +117,8 @@ def create_app(test_config=None):
     @requires_auth('get:movies')
     def movies():
       search_term = request.args.get("searchTerm", "", type = str)
-      if search_term is not None:
+      print(search_term)
+      if search_term:
         return search_movies(search_term)
 
       movies = Movie.query.order_by(Movie.id).all()
@@ -155,6 +156,7 @@ def create_app(test_config=None):
     def create_movie():
       error = False
       errorMsg = ""
+      movie_format = {}
       form = MovieForm(request.form, meta={'csrf': False})
       if not form.validate():
         error = True
@@ -181,6 +183,7 @@ def create_app(test_config=None):
           movie.genres = ','.join(genres)
 
           movie.insert()
+          movie_format = movie.format()
         except:
           db.session.rollback()
           error = True
@@ -201,7 +204,7 @@ def create_app(test_config=None):
       return jsonify(
         {
           'success': True,
-          'movie': movie.format()
+          'movie': movie_format
         }
       )
 
@@ -240,7 +243,7 @@ def create_app(test_config=None):
     @requires_auth('get:actors')
     def actors():
       search_term = request.args.get("searchTerm", "", type = str)
-      if search_term is not None:
+      if search_term:
         return search_actors(search_term)
 
       actors = Actor.query.order_by(Actor.id).all()
@@ -361,7 +364,7 @@ def create_app(test_config=None):
 
           movie_format = movie.format()
 
-          movie.insert()
+          movie.update()
         except:
           db.session.rollback()
           error = True
@@ -518,17 +521,14 @@ def create_app(test_config=None):
             raise Exception(errorMsg)
 
           casting = Casting()
-          print(len(Casting.query.all()))
           casting.id = len(Casting.query.all()) + 1
-          print(casting.id)
           casting.movie_id = form.movie_id.data
           casting.actor_id = form.actor_id.data
           casting.start_time = form.start_time.data
           casting.place = form.place.data
           
           castings_format = casting.format()
-          db.session.add(casting)
-          db.session.commit()
+          casting.insert()
         except:
           db.session.rollback()
           error = True
