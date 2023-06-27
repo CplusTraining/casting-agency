@@ -49,7 +49,12 @@ The access token will be displayed on the URL bar after login.
     <a href="https://fsnd-stu.us.auth0.com/authorize?audience=casting-agency&response_type=token&client_id=2NqLLf0o0DJrhgYUOhbSWHttGWPaM7gI&redirect_uri=http://localhost:3000/">Login locally</a>
     The access token will be displayed on the URL bar after login.
 
-7. Run test
+7. Run unittest
+   ```
+   python3 test_flask.py
+   ```
+
+8. Run test
 
     In Postman, import file **casting-agency.postman_collection.json** to run the test.
 
