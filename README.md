@@ -9,6 +9,36 @@ I developed this project to make use of the knowledge I acquired in Udacity nano
 
 The access token will be displayed on the URL bar after login.
 
+## THIRD-PARTY AUTHENTICATION
+### RABC
+- There are 3 roles 'Casting Assistant', 'Casting Director' and 'Executive Producer'.
+- To get access token for 'Casting Assistant', login with account:
+    - username: casting_assistant@gmail.com
+    - password: Abcd1234
+- To get access token for 'Casting Director', login with account:
+    - username: casting_director@gmail.com
+    - password: Abcd1234
+- To get access token for 'Executive Producer', login with account:
+    - username: executive_producer@gmail.com
+    - password: Abcd1234
+
+### auth.py
+Auth0 is set up and running. The following configurations are in a setup.sh file which is exported by the app:
+- The Auth0 Domain Name
+- The JWT code signing secret
+- The Auth0 Client ID
+The JWT token contains the permissions for the 'Executive Producer' roles.
+
+## DATA MODELING:
+### models.py
+The schema for the database and helper methods to simplify API behavior are in models.py:
+- There are three tables created: Movie, Acotr and Casting
+- The Movie table is used by the role 'Executive Producer' to add, update and create movies. 'Casting Director' and 'Casting Assistant' can retrieve movie list.
+- The Actor table is used by the role 'Executive Producer' and 'Casting Director' to add, update and create actors. 'Casting Assistant' can retrieve actor list.
+- The Casting table is used by the role 'Executive Producer', 'Casting Director' and 'Casting Assistant' to add, update and create castings and retrive all casting data
+- The Casting table has 2 foreign keys 'actor_id' and 'movie_id' for both Actor and Movie table.
+Each table has an insert, update, delete, and format helper functions.
+
 ## Run and Test local
 1. Run venv
 
@@ -109,6 +139,9 @@ The access token will be displayed on the URL bar after login.
     }
     ```
 
+- To get the tokens for this endpoints, we have to login with any role permission that is listed in RABC section.
+  Click on <a href="https://fsnd-stu.us.auth0.com/authorize?audience=casting-agency&response_type=token&client_id=2NqLLf0o0DJrhgYUOhbSWHttGWPaM7gI&redirect_uri=https://casting-agency-api.onrender.com/">Login</a> and enter one of those credentials into Auth0.
+
 #### GET '/movies?searchTerm=search_term'
 - Search movies in database by searchTerm
 - Sample curl:
@@ -141,6 +174,9 @@ The access token will be displayed on the URL bar after login.
     }
     ```
 
+- To get the tokens for this endpoints, we have to login with any role permission that is listed in RABC section.
+  Click on <a href="https://fsnd-stu.us.auth0.com/authorize?audience=casting-agency&response_type=token&client_id=2NqLLf0o0DJrhgYUOhbSWHttGWPaM7gI&redirect_uri=https://casting-agency-api.onrender.com/">Login</a> and enter one of those credentials into Auth0.
+
 #### GET '/movies/{movie_id}'
 - Get specific infor of a movie id
 - Sample curl:
@@ -169,6 +205,9 @@ The access token will be displayed on the URL bar after login.
         "success": true
     }
     ```
+
+- To get the tokens for this endpoints, we have to login with any role permission that is listed in RABC section.
+  Click on <a href="https://fsnd-stu.us.auth0.com/authorize?audience=casting-agency&response_type=token&client_id=2NqLLf0o0DJrhgYUOhbSWHttGWPaM7gI&redirect_uri=https://casting-agency-api.onrender.com/">Login</a> and enter one of those credentials into Auth0.
 
 #### PATCH '/movies/{movie_id}'
 - Update a movie id infomation
@@ -210,6 +249,9 @@ The access token will be displayed on the URL bar after login.
     }
     ```
 
+- To get the tokens for this endpoints, we have to login with 'Executive Producer' role permission that is listed in RABC section.
+  Click on <a href="https://fsnd-stu.us.auth0.com/authorize?audience=casting-agency&response_type=token&client_id=2NqLLf0o0DJrhgYUOhbSWHttGWPaM7gI&redirect_uri=https://casting-agency-api.onrender.com/">Login</a> and enter that credential into Auth0.
+
 #### POST '/movies'
 - Create a new movie
 - Sample curl:
@@ -250,6 +292,9 @@ The access token will be displayed on the URL bar after login.
     }
     ```
 
+- To get the tokens for this endpoints, we have to login with 'Executive Producer' role permission that is listed in RABC section.
+  Click on <a href="https://fsnd-stu.us.auth0.com/authorize?audience=casting-agency&response_type=token&client_id=2NqLLf0o0DJrhgYUOhbSWHttGWPaM7gI&redirect_uri=https://casting-agency-api.onrender.com/">Login</a> and enter that credential into Auth0.
+
 #### DELETE '/movies/{movie_id}'
 - Delete a movie by id
 - Sample curl:
@@ -266,6 +311,9 @@ The access token will be displayed on the URL bar after login.
         "success": true
     }
     ```
+
+- To get the tokens for this endpoints, we have to login with 'Executive Producer' role permission that is listed in RABC section.
+  Click on <a href="https://fsnd-stu.us.auth0.com/authorize?audience=casting-agency&response_type=token&client_id=2NqLLf0o0DJrhgYUOhbSWHttGWPaM7gI&redirect_uri=https://casting-agency-api.onrender.com/">Login</a> and enter that credential into Auth0.
 
 #### GET '/actors'
 - Return a list of actors in database
@@ -314,6 +362,9 @@ The access token will be displayed on the URL bar after login.
     }
     ```
 
+- To get the tokens for this endpoints, we have to login with any role permission that is listed in RABC section.
+  Click on <a href="https://fsnd-stu.us.auth0.com/authorize?audience=casting-agency&response_type=token&client_id=2NqLLf0o0DJrhgYUOhbSWHttGWPaM7gI&redirect_uri=https://casting-agency-api.onrender.com/">Login</a> and enter one of those credentials into Auth0.
+
 #### GET '/actors?searchTerm=search_term'
 - Return a list of movies that match the search term
 - Sample curl:
@@ -347,6 +398,9 @@ The access token will be displayed on the URL bar after login.
     }
     ```
 
+- To get the tokens for this endpoints, we have to login with any role permission that is listed in RABC section.
+  Click on <a href="https://fsnd-stu.us.auth0.com/authorize?audience=casting-agency&response_type=token&client_id=2NqLLf0o0DJrhgYUOhbSWHttGWPaM7gI&redirect_uri=https://casting-agency-api.onrender.com/">Login</a> and enter one of those credentials into Auth0.
+
 #### GET '/actors/{actor_id}'
 - Return actor info of an actor
 - Sample curl:
@@ -376,6 +430,9 @@ The access token will be displayed on the URL bar after login.
         "success": true
     }
     ```
+
+- To get the tokens for this endpoints, we have to login with any role permission that is listed in RABC section.
+  Click on <a href="https://fsnd-stu.us.auth0.com/authorize?audience=casting-agency&response_type=token&client_id=2NqLLf0o0DJrhgYUOhbSWHttGWPaM7gI&redirect_uri=https://casting-agency-api.onrender.com/">Login</a> and enter one of those credentials into Auth0.
 
 #### PATCH '/actors/{actor_id}'
 - Update actor info by id
@@ -419,6 +476,9 @@ The access token will be displayed on the URL bar after login.
     }
     ```
 
+- To get the tokens for this endpoints, we have to login with 'Executive Producer' or 'Casting Director' role permission that is listed in RABC section.
+  Click on <a href="https://fsnd-stu.us.auth0.com/authorize?audience=casting-agency&response_type=token&client_id=2NqLLf0o0DJrhgYUOhbSWHttGWPaM7gI&redirect_uri=https://casting-agency-api.onrender.com/">Login</a> and enter that credential into Auth0.
+
 #### POST '/actors'
 - Create a new actor
 - Sample curl
@@ -461,6 +521,9 @@ The access token will be displayed on the URL bar after login.
     }
     ```
 
+- To get the tokens for this endpoints, we have to login with 'Executive Producer' or 'Casting Director' role permission that is listed in RABC section.
+  Click on <a href="https://fsnd-stu.us.auth0.com/authorize?audience=casting-agency&response_type=token&client_id=2NqLLf0o0DJrhgYUOhbSWHttGWPaM7gI&redirect_uri=https://casting-agency-api.onrender.com/">Login</a> and enter that credential into Auth0.
+
 #### DELETE '/actors/{actor_id}'
 - Delete an actor by id
 - Sample curl
@@ -477,6 +540,9 @@ The access token will be displayed on the URL bar after login.
         "success": true
     }
     ```
+
+- To get the tokens for this endpoints, we have to login with 'Executive Producer' or 'Casting Director' role permission that is listed in RABC section.
+  Click on <a href="https://fsnd-stu.us.auth0.com/authorize?audience=casting-agency&response_type=token&client_id=2NqLLf0o0DJrhgYUOhbSWHttGWPaM7gI&redirect_uri=https://casting-agency-api.onrender.com/">Login</a> and enter that credential into Auth0.
 
 #### GET '/castings'
 - Return a list of castings in database
@@ -511,6 +577,9 @@ The access token will be displayed on the URL bar after login.
     }
     ```
 
+- To get the tokens for this endpoints, we have to login with any role permission that is listed in RABC section.
+  Click on <a href="https://fsnd-stu.us.auth0.com/authorize?audience=casting-agency&response_type=token&client_id=2NqLLf0o0DJrhgYUOhbSWHttGWPaM7gI&redirect_uri=https://casting-agency-api.onrender.com/">Login</a> and enter one of those credentials into Auth0.
+
 #### POST '/castings'
 - Create a new casting
 - Sample curl
@@ -538,6 +607,9 @@ The access token will be displayed on the URL bar after login.
     }
     ```
 
+- To get the tokens for this endpoints, we have to login with any role permission that is listed in RABC section.
+  Click on <a href="https://fsnd-stu.us.auth0.com/authorize?audience=casting-agency&response_type=token&client_id=2NqLLf0o0DJrhgYUOhbSWHttGWPaM7gI&redirect_uri=https://casting-agency-api.onrender.com/">Login</a> and enter one of those credentials into Auth0.
+
 #### DELETE '/castings/{casting_id}'
 - Delete a casting by id
 - Sample curl
@@ -554,6 +626,9 @@ The access token will be displayed on the URL bar after login.
         "success": true
     }
     ```
+
+- To get the tokens for this endpoints, we have to login with any role permission that is listed in RABC section.
+  Click on <a href="https://fsnd-stu.us.auth0.com/authorize?audience=casting-agency&response_type=token&client_id=2NqLLf0o0DJrhgYUOhbSWHttGWPaM7gI&redirect_uri=https://casting-agency-api.onrender.com/">Login</a> and enter one of those credentials into Auth0.
 
 
 ### Error handling
